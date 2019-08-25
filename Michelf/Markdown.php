@@ -176,7 +176,7 @@ class Markdown implements MarkdownInterface {
 	/**
 	 * Internal hashes used during transformation.
 	 * @var array
-/runBlock	 */
+	 */
 	protected $urls        = array();
 	protected $titles      = array();
 	protected $html_hashes = array();
