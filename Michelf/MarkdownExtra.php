@@ -1443,7 +1443,7 @@ class MarkdownExtra extends \Michelf\Markdown {
 		if ($leading_line || preg_match('/\n{2,}/', $def)) {
 			// Replace marker with the appropriate whitespace indentation
 			$def = str_repeat(' ', strlen($marker_space)) . $def;
-			$def = $this->runBlockGamut($this->outdent($def . "\n\n"));
+			$def = $this->runBlockListGamut($this->outdent($def . "\n\n"));
 			$def = "\n". $def ."\n";
 		}
 		else {

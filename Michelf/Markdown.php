@@ -176,7 +176,7 @@ class Markdown implements MarkdownInterface {
 	/**
 	 * Internal hashes used during transformation.
 	 * @var array
-	 */
+/runBlock	 */
 	protected $urls        = array();
 	protected $titles      = array();
 	protected $html_hashes = array();
@@ -552,22 +552,43 @@ class Markdown implements MarkdownInterface {
 		return $this->runBasicBlockGamut($text);
 	}
 
+  /**
+	 * Run block gamut tranformations for lists.
+	 *
+	 * We need to escape raw HTML in Markdown source before doing anything
+	 * else. This need to be done for each block, and not only at the
+	 * begining in the Markdown function since hashed blocks can be part of
+	 * list items and could have been indented. Indented blocks would have
+	 * been seen as a code block in a previous pass of hashHTMLBlocks.
+	 *
+	 * @param  string $text
+	 * @return string
+	 */
+	protected function runBlockListGamut($text) {
+		$text = $this->hashHTMLBlocks($text);
+		return $this->runBasicBlockGamut($text, false);
+	}
+
+
 	/**
 	 * Run block gamut tranformations, without hashing HTML blocks. This is
 	 * useful when HTML blocks are known to be already hashed, like in the first
 	 * whole-document pass.
 	 *
 	 * @param  string $text
+	 * @param  bool   $processParagraphs
 	 * @return string
 	 */
-	protected function runBasicBlockGamut($text) {
+	protected function runBasicBlockGamut($text, $processParagraphs = true) {
 
 		foreach ($this->block_gamut as $method => $priority) {
 			$text = $this->$method($text);
 		}
 
-		// Finally form paragraph and restore hashed blocks.
-		$text = $this->formParagraphs($text);
+    // Finally form paragraph and restore hashed blocks.
+    if ($processParagraphs) {
+  		$text = $this->formParagraphs($text);
+    }
 
 		return $text;
 	}
@@ -1177,7 +1198,7 @@ class Markdown implements MarkdownInterface {
 		{
 			// Replace marker with the appropriate whitespace indentation
 			$item = $leading_space . str_repeat(' ', strlen($marker_space)) . $item;
-			$item = $this->runBlockGamut($this->outdent($item)."\n");
+			$item = $this->runBlockListGamut($this->outdent($item)."\n");
 		} else {
 			// Recursion for sub-lists:
 			$item = $this->doLists($this->outdent($item));
