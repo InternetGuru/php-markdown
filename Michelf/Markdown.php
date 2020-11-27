@@ -4,7 +4,7 @@
  *
  * @package   php-markdown
  * @author    Michel Fortin <michel.fortin@michelf.com>
- * @copyright 2004-2018 Michel Fortin <https://michelf.com/projects/php-markdown/>
+ * @copyright 2004-2019 Michel Fortin <https://michelf.com/projects/php-markdown/>
  * @copyright (Original Markdown) 2004-2006 John Gruber <https://daringfireball.net/projects/markdown/>
  */
 
@@ -18,7 +18,7 @@ class Markdown implements MarkdownInterface {
 	 * Define the package version
 	 * @var string
 	 */
-	const MARKDOWNLIB_VERSION = "1.8.0";
+	const MARKDOWNLIB_VERSION = "1.9.0";
 
 	/**
 	 * Simple function interface - Initialize the parser and return the result
@@ -354,7 +354,7 @@ class Markdown implements MarkdownInterface {
 		$block_tags_b_re = 'p|div|h[1-6]|blockquote|pre|table|dl|ol|ul|address|'.
 						   'script|noscript|style|form|fieldset|iframe|math|svg|'.
 						   'article|section|nav|aside|hgroup|header|footer|'.
-						   'figure';
+						   'figure|details|summary';
 
 		// Regular expression for the content of a block tag.
 		$nested_tags_level = 4;
@@ -972,7 +972,7 @@ class Markdown implements MarkdownInterface {
 			return $matches[0];
 		}
 
-		$level = $matches[2]{0} == '=' ? 1 : 2;
+		$level = $matches[2][0] == '=' ? 1 : 2;
 
 		// ID attribute generation
 		$idAtt = $this->_generateIdFromHeaderValue($matches[1]);
@@ -1378,7 +1378,7 @@ class Markdown implements MarkdownInterface {
 				} else {
 					// Other closing marker: close one em or strong and
 					// change current token state to match the other
-					$token_stack[0] = str_repeat($token{0}, 3-$token_len);
+					$token_stack[0] = str_repeat($token[0], 3-$token_len);
 					$tag = $token_len == 2 ? "strong" : "em";
 					$span = $text_stack[0];
 					$span = $this->runSpanGamut($span);
@@ -1403,7 +1403,7 @@ class Markdown implements MarkdownInterface {
 				} else {
 					// Reached opening three-char emphasis marker. Push on token
 					// stack; will be handled by the special condition above.
-					$em = $token{0};
+					$em = $token[0];
 					$strong = "$em$em";
 					array_unshift($token_stack, $token);
 					array_unshift($text_stack, '');
@@ -1816,9 +1816,9 @@ class Markdown implements MarkdownInterface {
 	 * @return string
 	 */
 	protected function handleSpanToken($token, &$str) {
-		switch ($token{0}) {
+		switch ($token[0]) {
 			case "\\":
-				return $this->hashPart("&#". ord($token{1}). ";");
+				return $this->hashPart("&#". ord($token[1]). ";");
 			case "`":
 				// Search for end marker in remaining text.
 				if (preg_match('/^(.*?[^`])'.preg_quote($token).'(?!`)(.*)$/sm',
